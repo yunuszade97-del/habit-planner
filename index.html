@@ -23,7 +23,10 @@
                     </path>
                 </svg>
             </button>
-            <h1 class="header-title">Привычки</h1>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="daily">Ежедневные</button>
+                <button class="tab-btn" data-tab="goals">Планы на год</button>
+            </div>
             <button class="icon-btn icon-btn--primary" id="btn-add-task" aria-label="Добавить задачу">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -37,10 +40,17 @@
             <!-- Дни будут сгенерированы через JS -->
         </section>
 
-        <!-- Список привычек -->
-        <main class="tasks-list" id="tasks-list">
-            <!-- Задачи будут сгенерированы через JS -->
-        </main>
+        <div class="content-wrapper">
+            <!-- Список ежедневных привычек -->
+            <main class="tasks-list view-section active" id="view-daily">
+                <!-- Задачи будут сгенерированы через JS -->
+            </main>
+
+            <!-- Список целей и привычек внутри них -->
+            <main class="goals-list view-section" id="view-goals">
+                <!-- Цели будут сгенерированы через JS -->
+            </main>
+        </div>
     </div>
 
     <!-- Модальное окно добавления -->
@@ -61,6 +71,30 @@
                 <button type="button" class="btn btn-danger" id="btn-delete"
                     style="display: none; margin-right: auto;">Удалить</button>
                 <button type="button" class="btn btn-secondary" id="btn-cancel">Отмена</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Модальное окно создания Цели -->
+    <dialog id="modal-add-goal" class="modal">
+        <form id="form-add-goal" class="modal-content" method="dialog">
+            <h2>Новая цель на год</h2>
+            <div class="form-group">
+                <label for="goal-title">Название цели</label>
+                <input type="text" id="goal-title" name="title" required maxlength="100"
+                    placeholder="Например: Выучить английский" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="goal-desc">Описание (опционально)</label>
+                <textarea id="goal-desc" name="description" rows="3" maxlength="300"
+                    placeholder="Почему это важно..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-danger" id="btn-delete-goal"
+                    style="display: none; margin-right: auto;">Удалить</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="document.getElementById('modal-add-goal').close()">Отмена</button>
                 <button type="submit" class="btn btn-primary">Сохранить</button>
             </div>
         </form>

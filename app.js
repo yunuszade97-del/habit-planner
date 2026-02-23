@@ -5,8 +5,11 @@
 // --- MODEL (Состояние) ---
 const AppState = {
     tasks: [],
+    goals: [],
     dates: [], // Последние 5 дней
-    editingTaskId: null
+    activeTab: 'daily', // 'daily' | 'goals'
+    editingTaskId: null,
+    editingGoalId: null
 };
 
 // --- CONTROLLER / МЕТОДЫ ---
@@ -20,74 +23,95 @@ const PlannerController = {
     },
 
     loadData() {
-        const saved = localStorage.getItem('planner_tasks');
-        if (saved) {
+        const savedTasks = localStorage.getItem('planner_tasks');
+        const savedGoals = localStorage.getItem('planner_goals');
+
+        if (savedTasks) {
             try {
-                AppState.tasks = JSON.parse(saved);
+                AppState.tasks = JSON.parse(savedTasks);
             } catch (e) {
                 console.error('Failed to parse tasks from localStorage');
                 AppState.tasks = [];
             }
         } else {
-            // Dummy data для старта
             AppState.tasks = [
-                { id: 1, title: 'Поиск работы', description: 'Откликнуться на 5 вакансий', history: {} }
+                { id: 1, title: 'Поиск работы', description: 'Откликнуться на 5 вакансий', history: {}, goalId: null }
             ];
+        }
+
+        if (savedGoals) {
+            try {
+                AppState.goals = JSON.parse(savedGoals);
+            } catch (e) {
+                console.error('Failed to parse goals from localStorage');
+                AppState.goals = [];
+            }
         }
     },
 
     saveData() {
         localStorage.setItem('planner_tasks', JSON.stringify(AppState.tasks));
+        localStorage.setItem('planner_goals', JSON.stringify(AppState.goals));
     },
 
     cacheDOM() {
         this.calendarHeader = document.getElementById('calendar-header');
-        this.tasksList = document.getElementById('tasks-list');
-        this.modal = document.getElementById('modal-add-task');
-        this.formAdd = document.getElementById('form-add-task');
-        this.btnAdd = document.getElementById('btn-add-task');
-        this.btnCancel = document.getElementById('btn-cancel');
-        this.btnDelete = document.getElementById('btn-delete');
+        this.tasksList = document.getElementById('view-daily');
+        this.goalsList = document.getElementById('view-goals');
+
+        // Modal Task
+        this.modalTask = document.getElementById('modal-add-task');
+        this.formTask = document.getElementById('form-add-task');
+        this.btnDeleteTask = document.getElementById('btn-delete');
+
+        // Modal Goal
+        this.modalGoal = document.getElementById('modal-add-goal');
+        this.formGoal = document.getElementById('form-add-goal');
+        this.btnDeleteGoal = document.getElementById('btn-delete-goal');
+
+        this.btnAddMain = document.getElementById('btn-add-task');
+        this.tabBtns = document.querySelectorAll('.tab-btn');
     },
 
     bindEvents() {
-        this.btnAdd.addEventListener('click', () => {
-            AppState.editingTaskId = null;
-            this.modal.querySelector('h2').textContent = 'Новая привычка';
-            this.btnDelete.style.display = 'none';
-            this.formAdd.reset();
-            this.modal.showModal();
+        // Табы
+        this.tabBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
         });
 
-        this.btnCancel.addEventListener('click', () => {
-            this.modal.close();
-            this.formAdd.reset();
-        });
-
-        // Закрытие по клику вне модалки
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) {
-                this.modal.close();
-                this.formAdd.reset();
+        // Главная кнопка Добавить
+        this.btnAddMain.addEventListener('click', () => {
+            if (AppState.activeTab === 'daily') {
+                this.openTaskModal();
+            } else {
+                this.openGoalModal();
             }
         });
 
-        this.formAdd.addEventListener('submit', (e) => this.handleAddTask(e));
+        // Модалка Задач
+        document.getElementById('btn-cancel').addEventListener('click', () => {
+            this.modalTask.close();
+            this.formTask.reset();
+        });
+        this.formTask.addEventListener('submit', (e) => this.handleAddTask(e));
+        this.btnDeleteTask.addEventListener('click', () => this.handleDeleteTask());
 
-        this.btnDelete.addEventListener('click', () => {
-            if (AppState.editingTaskId) {
-                if (confirm('Точно удалить эту привычку?')) {
-                    AppState.tasks = AppState.tasks.filter(t => t.id !== AppState.editingTaskId);
-                    this.saveData();
-                    this.renderTasks();
-                    this.modal.close();
-                    this.formAdd.reset();
+        // Модалка Целей
+        this.formGoal.addEventListener('submit', (e) => this.handleAddGoal(e));
+        this.btnDeleteGoal.addEventListener('click', () => this.handleDeleteGoal());
+
+        // Закрытие по клику вне
+        [this.modalTask, this.modalGoal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.close();
+                    modal.querySelector('form').reset();
                 }
-            }
+            });
         });
 
-        // Делегирование событий для кликов по истории и кнопке редактирования
-        this.tasksList.addEventListener('click', (e) => {
+        // Делегирование событий (история, редактирование)
+        const handleItemsClick = (e) => {
             const historyIcon = e.target.closest('.history-icon');
             if (historyIcon) {
                 const taskId = parseInt(historyIcon.dataset.taskId, 10);
@@ -99,27 +123,99 @@ const PlannerController = {
             const editBtn = e.target.closest('.edit-btn');
             if (editBtn) {
                 const taskId = parseInt(editBtn.dataset.taskId, 10);
-                this.openEditModal(taskId);
+                this.openTaskModal(taskId);
+                return;
             }
-        });
+
+            const editGoalBtn = e.target.closest('.edit-goal-btn');
+            if (editGoalBtn) {
+                const goalId = parseInt(editGoalBtn.dataset.goalId, 10);
+                this.openGoalModal(goalId);
+                return;
+            }
+
+            const addTaskToGoalBtn = e.target.closest('.add-task-to-goal-btn');
+            if (addTaskToGoalBtn) {
+                const goalId = parseInt(addTaskToGoalBtn.dataset.goalId, 10);
+                this.openTaskModal(null, goalId);
+                return;
+            }
+        };
+
+        this.tasksList.addEventListener('click', handleItemsClick);
+        this.goalsList.addEventListener('click', handleItemsClick);
     },
 
-    openEditModal(taskId) {
-        const task = AppState.tasks.find(t => t.id === taskId);
-        if (task) {
-            AppState.editingTaskId = taskId;
-            this.modal.querySelector('h2').textContent = 'Редактировать привычку';
-            this.btnDelete.style.display = 'block';
+    switchTab(tabId) {
+        AppState.activeTab = tabId;
+        this.tabBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
 
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = task.title;
-            this.formAdd.elements['title'].value = tempDiv.textContent || tempDiv.innerText || '';
+        document.getElementById('view-daily').classList.toggle('active', tabId === 'daily');
+        document.getElementById('view-goals').classList.toggle('active', tabId === 'goals');
+    },
 
-            tempDiv.innerHTML = task.description || '';
-            this.formAdd.elements['description'].value = tempDiv.textContent || tempDiv.innerText || '';
+    openTaskModal(taskId = null, goalId = null) {
+        this.formTask.reset();
+        const h2 = this.modalTask.querySelector('h2');
 
-            this.modal.showModal();
+        // Сохраняем скрытый input для targetGoalId
+        let hiddenInput = this.formTask.querySelector('input[name="targetGoalId"]');
+        if (!hiddenInput) {
+            hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'targetGoalId';
+            this.formTask.appendChild(hiddenInput);
         }
+        hiddenInput.value = goalId || '';
+
+        if (taskId) {
+            const task = AppState.tasks.find(t => t.id === taskId);
+            if (task) {
+                AppState.editingTaskId = taskId;
+                h2.textContent = 'Редактировать привычку';
+                this.btnDeleteTask.style.display = 'block';
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = task.title;
+                this.formTask.elements['title'].value = tempDiv.textContent || '';
+                tempDiv.innerHTML = task.description || '';
+                this.formTask.elements['description'].value = tempDiv.textContent || '';
+
+                hiddenInput.value = task.goalId || '';
+            }
+        } else {
+            AppState.editingTaskId = null;
+            h2.textContent = goalId ? 'Новая привычка для цели' : 'Новая привычка';
+            this.btnDeleteTask.style.display = 'none';
+        }
+
+        this.modalTask.showModal();
+    },
+
+    openGoalModal(goalId = null) {
+        this.formGoal.reset();
+        const h2 = this.modalGoal.querySelector('h2');
+
+        if (goalId) {
+            const goal = AppState.goals.find(g => g.id === goalId);
+            if (goal) {
+                AppState.editingGoalId = goalId;
+                h2.textContent = 'Редактировать цель';
+                this.btnDeleteGoal.style.display = 'block';
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = goal.title;
+                this.formGoal.elements['title'].value = tempDiv.textContent || '';
+                tempDiv.innerHTML = goal.description || '';
+                this.formGoal.elements['description'].value = tempDiv.textContent || '';
+            }
+        } else {
+            AppState.editingGoalId = null;
+            h2.textContent = 'Новая цель на год';
+            this.btnDeleteGoal.style.display = 'none';
+        }
+
+        this.modalGoal.showModal();
     },
 
     generateDates() {
@@ -131,30 +227,27 @@ const PlannerController = {
             const d = new Date(today);
             d.setDate(today.getDate() - i);
 
-            // Format YYYY-MM-DD safely
             const year = d.getFullYear();
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
-            const dateStr = `${year}-${month}-${day}`;
 
             AppState.dates.push({
-                dateString: dateStr,
+                dateString: `${year}-${month}-${day}`,
                 num: d.getDate(),
                 name: daysRaw[d.getDay()],
-                isToday: i === 0 // Поскольку генерируем до i=0 (текущий день)
+                isToday: i === 0
             });
         }
     },
 
     handleAddTask(e) {
-        // Форма закроется сама благодаря method="dialog", но перехватываем данные
-        const formData = new FormData(this.formAdd);
+        const formData = new FormData(this.formTask);
         const rawTitle = formData.get('title').trim();
         const rawDesc = formData.get('description').trim();
+        const targetGoalId = formData.get('targetGoalId');
 
         if (!rawTitle) return;
 
-        // SECURITY FIRST: Санитизация данных
         const safeTitle = SecurityService.sanitizeHTML(rawTitle);
         const safeDesc = SecurityService.sanitizeHTML(rawDesc);
 
@@ -163,22 +256,71 @@ const PlannerController = {
             if (task) {
                 task.title = safeTitle;
                 task.description = safeDesc;
+                // Не меняем goalId при редактировании
             }
             AppState.editingTaskId = null;
         } else {
-            const newTask = {
+            AppState.tasks.push({
                 id: Date.now(),
                 title: safeTitle,
                 description: safeDesc,
-                history: {}
-            };
-            AppState.tasks.push(newTask);
+                history: {},
+                goalId: targetGoalId ? parseInt(targetGoalId, 10) : null
+            });
         }
 
         this.saveData();
-        this.formAdd.reset();
+        this.modalTask.close();
+        this.renderAll();
+    },
 
-        this.renderTasks();
+    handleAddGoal(e) {
+        const formData = new FormData(this.formGoal);
+        const rawTitle = formData.get('title').trim();
+        const rawDesc = formData.get('description').trim();
+
+        if (!rawTitle) return;
+
+        const safeTitle = SecurityService.sanitizeHTML(rawTitle);
+        const safeDesc = SecurityService.sanitizeHTML(rawDesc);
+
+        if (AppState.editingGoalId) {
+            const goal = AppState.goals.find(g => g.id === AppState.editingGoalId);
+            if (goal) {
+                goal.title = safeTitle;
+                goal.description = safeDesc;
+            }
+            AppState.editingGoalId = null;
+        } else {
+            AppState.goals.push({
+                id: Date.now(),
+                title: safeTitle,
+                description: safeDesc
+            });
+        }
+
+        this.saveData();
+        this.modalGoal.close();
+        this.renderAll();
+    },
+
+    handleDeleteTask() {
+        if (AppState.editingTaskId && confirm('Точно удалить эту привычку?')) {
+            AppState.tasks = AppState.tasks.filter(t => t.id !== AppState.editingTaskId);
+            this.saveData();
+            this.modalTask.close();
+            this.renderAll();
+        }
+    },
+
+    handleDeleteGoal() {
+        if (AppState.editingGoalId && confirm('Точно удалить эту цель и все её привычки?')) {
+            AppState.tasks = AppState.tasks.filter(t => t.goalId !== AppState.editingGoalId);
+            AppState.goals = AppState.goals.filter(g => g.id !== AppState.editingGoalId);
+            this.saveData();
+            this.modalGoal.close();
+            this.renderAll();
+        }
     },
 
     toggleTaskHistory(taskId, dateStr) {
@@ -195,7 +337,12 @@ const PlannerController = {
     // --- VIEW (Отображение) ---
     render() {
         this.renderCalendarHeader();
-        this.renderTasks();
+        this.renderAll();
+    },
+
+    renderAll() {
+        this.renderDailyTasks();
+        this.renderGoals();
     },
 
     renderCalendarHeader() {
@@ -207,19 +354,15 @@ const PlannerController = {
         `).join('');
     },
 
-    renderTasks() {
+    generateTasksHTML(tasksList) {
         const svgCross = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
         const svgCheck = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
         const svgEdit = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
 
-        if (AppState.tasks.length === 0) {
-            this.tasksList.innerHTML = `<div style="text-align:center; padding: 40px; color: #8A92A0;">Нет привычек. Нажмите "+" для создания.</div>`;
-            return;
-        }
+        if (tasksList.length === 0) return '';
 
-        const tasksHTML = AppState.tasks.map(task => {
+        return tasksList.map(task => {
             const historyObj = task.history || {};
-            // Статус основного кружочка зависит от выполнения привычки сегодня (которое теперь всегда по индексу 0)
             const todayStr = AppState.dates[0].dateString;
             const isCompletedToday = historyObj[todayStr];
 
@@ -251,8 +394,50 @@ const PlannerController = {
             </div>
             `;
         }).join('');
+    },
 
-        this.tasksList.innerHTML = tasksHTML;
+    renderDailyTasks() {
+        const dailyTasks = AppState.tasks.filter(t => !t.goalId);
+
+        if (dailyTasks.length === 0) {
+            this.tasksList.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-muted); font-size: 14px;">Нет ежедневных привычек.<br>Нажмите "+" для создания.</div>`;
+        } else {
+            this.tasksList.innerHTML = this.generateTasksHTML(dailyTasks);
+        }
+    },
+
+    renderGoals() {
+        const svgEdit = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+
+        if (AppState.goals.length === 0) {
+            this.goalsList.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-muted); font-size: 14px;">Нет целей на год.<br>Нажмите "+" в правом верхнем углу для создания.</div>`;
+            return;
+        }
+
+        this.goalsList.innerHTML = AppState.goals.map(goal => {
+            const goalTasks = AppState.tasks.filter(t => t.goalId === goal.id);
+            const tasksHTML = goalTasks.length > 0
+                ? this.generateTasksHTML(goalTasks)
+                : `<div style="padding: 16px 24px; color: var(--text-muted); font-size: 13px;">В этой цели пока нет привычек.</div>`;
+
+            return `
+            <div class="goal-card">
+                <div class="goal-header">
+                    <div class="goal-header-info">
+                        <div class="goal-title">${goal.title}</div>
+                        ${goal.description ? `<div class="goal-desc">${goal.description}</div>` : ''}
+                    </div>
+                    <div class="goal-actions">
+                        <button class="btn btn-secondary btn-small add-task-to-goal-btn" data-goal-id="${goal.id}">+ Привычка</button>
+                        <button class="icon-btn edit-goal-btn" style="width:32px; height:32px; box-shadow:none;" data-goal-id="${goal.id}">${svgEdit}</button>
+                    </div>
+                </div>
+                <div class="goal-tasks-list">
+                    ${tasksHTML}
+                </div>
+            </div>
+            `;
+        }).join('');
     }
 };
 
