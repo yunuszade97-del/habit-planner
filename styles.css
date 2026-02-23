@@ -200,7 +200,7 @@ body {
 
 .task-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding: 16px 24px;
     border-bottom: 1px solid var(--border-color);
     animation: fadeIn 0.4s ease-out forwards;
@@ -209,7 +209,7 @@ body {
 .task-info {
     flex: 1;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
 }
 
@@ -220,6 +220,8 @@ body {
     border: 2px solid var(--text-muted);
     opacity: 0.5;
     transition: all var(--transition);
+    margin-top: 2px;
+    flex-shrink: 0;
 }
 
 .task-status-circle.completed {
