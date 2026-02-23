@@ -1,0 +1,19 @@
+# Настройки macOS
+.DS_Store
+
+# Зависимости и логи (если будем использовать Node.js/npm)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Локальные файлы редакторов (VS Code, WebStorm)
+.vscode/
+.idea/
+
+# Переменные окружения (на будущее)
+.env
+.env.local
+
+# Архивы
+*.zip
+*.tar.gz

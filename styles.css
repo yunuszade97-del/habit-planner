@@ -1,0 +1,356 @@
+:root {
+    --bg-color: #F4F6F9;
+    --surface-color: #FFFFFF;
+    --text-main: #1A1D20;
+    --text-muted: #8A92A0;
+    --primary-color: #007AFF;
+    --border-color: #E2E6EA;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.1);
+    --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    /* Имитация мобильного интерфейса на ПК */
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    position: relative;
+    box-shadow: var(--shadow-lg);
+    margin: 0 auto;
+}
+
+@media (max-width: 480px) {
+    .app-container {
+        box-shadow: none;
+        /* Убираем тени для настоящих телефонов, где экран 100% */
+    }
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: var(--bg-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface-color);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-main);
+    transition: transform var(--transition);
+}
+
+.icon-btn:hover {
+    transform: scale(1.05);
+}
+
+.icon-btn:active {
+    transform: scale(0.95);
+}
+
+.icon-btn--primary {
+    color: var(--primary-color);
+}
+
+/* Calendar Header */
+.calendar-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 24px 20px;
+    gap: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.calendar-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    min-width: 24px;
+}
+
+.calendar-day .day-num {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 2px;
+}
+
+.calendar-day.current-day .day-num {
+    color: var(--primary-color);
+}
+
+.calendar-day.current-day .day-name {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Tasks Loop */
+.tasks-list {
+    background: var(--surface-color);
+    min-height: calc(100vh - 120px);
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-color);
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.task-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.task-status-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--text-muted);
+    opacity: 0.5;
+    transition: all var(--transition);
+}
+
+.task-status-circle.completed {
+    border-color: #34C759;
+    background-color: #34C759;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+    background-size: 12px;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 1;
+}
+
+.task-text-content {
+    flex: 1;
+    overflow: hidden;
+}
+
+.task-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-title {
+    font-size: 15px;
+    color: var(--primary-color);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.edit-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    margin: -6px;
+    /* Увеличиваем зону клика */
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition), color var(--transition);
+}
+
+/* На мобильных (touch) всегда показываем карандаш */
+@media (hover: none) and (pointer: coarse) {
+    .edit-btn {
+        opacity: 1;
+    }
+}
+
+/* При наведении мышкой на десктопе */
+.task-item:hover .edit-btn,
+.edit-btn:focus {
+    opacity: 1;
+}
+
+.edit-btn:hover {
+    color: var(--primary-color);
+}
+
+.task-description {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    display: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.task-item.has-desc .task-description {
+    display: block;
+}
+
+.task-history {
+    display: flex;
+    gap: 16px;
+    margin-left: 16px;
+}
+
+.history-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--border-color);
+    cursor: pointer;
+    transition: color var(--transition);
+}
+
+.history-icon:hover {
+    color: var(--text-muted);
+}
+
+.history-icon.checked {
+    color: #34C759;
+}
+
+/* Modal */
+.modal {
+    margin: auto;
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 400px;
+    padding: 0;
+    background: var(--surface-color);
+}
+
+.modal::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    padding: 24px;
+}
+
+.modal h2 {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color var(--transition);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: opacity var(--transition);
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background: var(--bg-color);
+    color: var(--text-main);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-danger {
+    background: #FF3B30;
+    color: white;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
