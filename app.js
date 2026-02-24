@@ -334,7 +334,7 @@ const PlannerController = {
             // Переключаем статус выполнения для конкретной даты
             task.history[dateStr] = !task.history[dateStr];
             this.saveData();
-            this.renderTasks(); // Перерисовываем для обновления UI
+            this.renderAll(); // Перерисовываем для обновления UI
         }
     },
 
