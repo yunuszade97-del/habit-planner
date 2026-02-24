@@ -116,7 +116,7 @@ const PlannerController = {
             if (historyIcon) {
                 const taskId = parseInt(historyIcon.dataset.taskId, 10);
                 const dateStr = historyIcon.dataset.date;
-                this.toggleTaskHistory(taskId, dateStr);
+                this.toggleTaskHistory(taskId, dateStr, historyIcon);
                 return;
             }
 
@@ -327,14 +327,23 @@ const PlannerController = {
         }
     },
 
-    toggleTaskHistory(taskId, dateStr) {
+    toggleTaskHistory(taskId, dateStr, element = null) {
         const task = AppState.tasks.find(t => t.id === taskId);
         if (task) {
             if (!task.history) task.history = {};
-            // Переключаем статус выполнения для конкретной даты
-            task.history[dateStr] = !task.history[dateStr];
+            const isNowCompleted = !task.history[dateStr];
+            task.history[dateStr] = isNowCompleted;
             this.saveData();
-            this.renderAll(); // Перерисовываем для обновления UI
+
+            if (element) {
+                const svgCross = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                const svgCheck = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+                element.innerHTML = isNowCompleted ? svgCheck : svgCross;
+                element.classList.toggle('checked', isNowCompleted);
+            } else {
+                this.renderAll(); // Fallback если элемент не передан
+            }
         }
     },
 
