@@ -1,4 +1,6 @@
 :root {
+    color-scheme: light;
+    /* Forces Safari/iOS to treat background as light by default */
     --bg-color: #F4F6F9;
     --surface-color: #FFFFFF;
     --text-main: #1A1D20;
