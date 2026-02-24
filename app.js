@@ -241,6 +241,8 @@ const PlannerController = {
     },
 
     handleAddTask(e) {
+        e.preventDefault(); // Предотвращаем перезагрузку страницы ("вырубается")
+
         const formData = new FormData(this.formTask);
         const rawTitle = formData.get('title').trim();
         const rawDesc = formData.get('description').trim();
@@ -275,6 +277,8 @@ const PlannerController = {
     },
 
     handleAddGoal(e) {
+        e.preventDefault(); // Предотвращаем перезагрузку страницы
+
         const formData = new FormData(this.formGoal);
         const rawTitle = formData.get('title').trim();
         const rawDesc = formData.get('description').trim();
@@ -369,7 +373,6 @@ const PlannerController = {
             return `
             <div class="task-item ${task.description ? 'has-desc' : ''}">
                 <div class="task-info">
-                    <div class="task-status-circle ${isCompletedToday ? 'completed' : ''}"></div>
                     <div class="task-text-content">
                         <div class="task-title-wrap">
                             <div class="task-title">${task.title}</div>

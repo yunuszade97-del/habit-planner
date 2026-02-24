@@ -213,26 +213,7 @@ body {
     gap: 12px;
 }
 
-.task-status-circle {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid var(--text-muted);
-    opacity: 0.5;
-    transition: all var(--transition);
-    margin-top: 2px;
-    flex-shrink: 0;
-}
 
-.task-status-circle.completed {
-    border-color: #34C759;
-    background-color: #34C759;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
-    background-size: 12px;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 1;
-}
 
 .task-text-content {
     flex: 1;
@@ -303,19 +284,30 @@ body {
 
 .task-history {
     display: flex;
-    gap: 16px;
+    gap: 8px;
+    /* Slightly reduced gap since hit targets are larger */
     margin-left: 16px;
 }
 
 .history-icon {
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 36px;
+    margin: -6px;
+    /* Offset the size increase to keep layout identical */
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--border-color);
     cursor: pointer;
-    transition: color var(--transition);
+    transition: color var(--transition), transform var(--transition);
+    border-radius: 50%;
+    -webkit-tap-highlight-color: transparent;
+    /* Remove default blue tap highlight on iOS */
+}
+
+.history-icon:active {
+    transform: scale(0.85);
+    /* Visual feedback exactly on touch */
 }
 
 .history-icon:hover {
