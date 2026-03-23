@@ -235,6 +235,21 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.task-title:hover {
+    text-decoration: underline;
+}
+
+.stat-badge {
+    background: #E3E8EE;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 12px;
+    white-space: nowrap;
 }
 
 .edit-btn {
@@ -408,6 +423,547 @@ body {
 .btn-danger {
     background: #FF3B30;
     color: white;
+}
+
+/* Modal Statistics override */
+.modal-stats .modal-content {
+    position: relative;
+    padding: 32px 24px;
+}
+
+.btn-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color var(--transition), color var(--transition);
+}
+
+.btn-close:hover {
+    background-color: #E3E8EE;
+    color: var(--text-main);
+}
+
+.stats-title {
+    font-size: 20px;
+    margin-bottom: 24px;
+    padding-right: 32px;
+    color: var(--text-main);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.stat-card {
+    background: var(--bg-color);
+    padding: 16px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.stat-card.full-width {
+    grid-column: span 2;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 24px 16px;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Progress Ring HTML/CSS */
+.progress-ring-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.progress-ring-circle-bg {
+    fill: none;
+    stroke: #E3E8EE;
+    stroke-width: 6;
+}
+
+.progress-ring-circle {
+    fill: none;
+    stroke: var(--primary-color);
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease-out;
+}
+
+.progress-ring-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+    z-index: 1;
+}
+
+/* Auth Screen */
+.auth-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.auth-screen.hidden {
+    display: none;
+}
+
+.auth-card {
+    background: var(--surface-color);
+    padding: 32px 24px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.auth-title {
+    font-size: 24px;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.auth-form {
+    text-align: left;
+}
+
+.auth-btn-submit {
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px;
+    font-size: 16px;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 24px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.auth-divider span {
+    padding: 0 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.auth-social-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background var(--transition);
+}
+
+.btn-social:hover {
+    background: #E3E8EE;
+}
+
+.btn-text {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+}
+
+.btn-text:hover {
+    color: var(--text-main);
+}
+
+.auth-error-msg {
+    color: #FF3B30;
+    font-size: 13px;
+    background: #FFEBEA;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+/* Paywall Modal */
+.modal-paywall .paywall-content {
+    padding: 32px 24px 24px;
+    text-align: center;
+}
+
+.paywall-header {
+    margin-bottom: 24px;
+}
+
+.paywall-icon {
+    margin-bottom: 12px;
+}
+
+.paywall-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.paywall-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.paywall-benefits {
+    list-style: none;
+    background: linear-gradient(135deg, #F0F7FF 0%, #F4F6F9 100%);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.paywall-benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-main);
+    padding: 10px 0;
+}
+
+.paywall-benefit-item + .paywall-benefit-item {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.paywall-check {
+    flex-shrink: 0;
+}
+
+.paywall-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-paywall-buy {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #007AFF 0%, #0055D4 100%);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.btn-paywall-buy:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+    opacity: 1;
+}
+
+.btn-paywall-buy:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.btn-paywall-later {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    color: var(--text-muted);
+    background: transparent;
+}
+
+/* Notes Button */
+.icon-btn--notes {
+    background: none;
+    box-shadow: none;
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    line-height: 1;
+}
+
+/* Notes Modal */
+.modal-notes .modal-content {
+    padding: 24px;
+}
+
+.notes-textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text-main);
+    background: var(--surface-color);
+    resize: vertical;
+    transition: border-color var(--transition);
+}
+
+.notes-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.notes-textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* Premium Lock - Read-only state */
+.premium-locked .task-item {
+    opacity: 0.6;
+}
+
+.premium-locked .history-icon {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.premium-locked .edit-btn,
+.premium-locked .add-task-to-goal-btn,
+.premium-locked .edit-goal-btn {
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.premium-locked #btn-add-task {
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.premium-locked .goal-card {
+    opacity: 0.6;
+}
+
+/* Premium Banner */
+.premium-banner {
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+    color: #E65100;
+    text-align: center;
+    padding: 10px 24px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.premium-banner .btn-text {
+    color: #E65100;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* Backgrounds Modal */
+.backgrounds-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.bg-card {
+    cursor: pointer;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    padding: 8px;
+    transition: border-color var(--transition), transform var(--transition);
+    text-align: center;
+}
+
+.bg-card:hover {
+    transform: scale(1.05);
+}
+
+.bg-card.active {
+    border-color: var(--primary-color);
+}
+
+.bg-preview {
+    width: 100%;
+    height: 60px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+
+.bg-preview-surface {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.bg-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.bg-lock {
+    font-size: 10px;
+}
+
+/* Profile Modal */
+.profile-content {
+    padding: 24px;
+}
+
+.profile-info {
+    background: var(--bg-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.profile-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.profile-row + .profile-row {
+    border-top: 1px solid var(--border-color);
+}
+
+.profile-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.profile-value {
+    font-size: 14px;
+    color: var(--text-main);
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.profile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+}
+
+.profile-status-msg {
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.profile-status-success {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.profile-status-error {
+    background: #FFEBEE;
+    color: #C62828;
+}
+
+/* Delete Confirmation Modal */
+.delete-warning {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 8px;
 }
 
 @keyframes fadeIn {
